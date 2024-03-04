@@ -48,3 +48,5 @@ char **read_dictionary(const char *path, int *word_count) {
     *word_count = count;
     return words;
 }
+
+// test push
