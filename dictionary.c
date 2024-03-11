@@ -9,7 +9,7 @@
 static char **dict_array;
 
 #ifndef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 #endif
 
 #ifndef BUFLENGTH
@@ -24,7 +24,7 @@ char *allocate_and_copy_word(const char *word) {
     return new_word;
 }
 
-int find_dictlength(int fd, char *path) {
+int find_dictlength(int fd) {
     int result = 0;
     int buflength = BUFLENGTH;
 	char *buf = malloc(BUFLENGTH);
@@ -42,6 +42,7 @@ int find_dictlength(int fd, char *path) {
 				line_start = pos + 1;
                 result += 1;
 			}
+			
 			pos++;
 		}
 		// no partial line
@@ -68,10 +69,14 @@ int find_dictlength(int fd, char *path) {
 		}
 		buf[pos] = '\0';
 		// use_line(arg, buf + line_start);
+		result++;
 	}
 	free(buf);
+	return result;
 }
 
+
+//currently there is an infinite loop from the lseek at the end of the read
 char **read_dictionary(const char *path, int *word_count) {
     int fd = open(path, O_RDONLY);
     if (fd < 0) {
@@ -80,18 +85,95 @@ char **read_dictionary(const char *path, int *word_count) {
     }
 
     // char **words = (char **)malloc(INITIAL_ARRAY_SIZE * sizeof(char *));
-	int numlines = find_dictlength(fd, path);
+	int numlines = find_dictlength(fd);
+	
+	printf("Numlines: %d\n", numlines);
+
 	dict_array = (char **) malloc(numlines * sizeof(char *));
     if (dict_array == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
-        // fclose(file);
+        close(fd);
         return NULL;
     }
 
-	qsort(dict_array);
+	//this is a cool posix function that lets you set the read position back to the beginning
+	lseek(fd, 0, SEEK_SET);
+	
+	//qsort(dict_array);
 
-    char buffer[MAX_WORD_LENGTH];
+	//will simply do buffer size to max word length 
+	//we can possibly find the max word length when we run dictLength 
+	char buffer[MAX_WORD_LENGTH];
     int count = 0;
+    ssize_t bytes_read;
+
+    while ((bytes_read = (read(fd, buffer, MAX_WORD_LENGTH - 1))) > 0) {
+		int newline_pos = -1;
+        for (int i = 0; i < bytes_read; ++i) {
+            if (buffer[i] == '\n') {
+                newline_pos = i;
+                break;
+            }
+        }
+
+		if (newline_pos != -1){
+			buffer[newline_pos] = '\0';
+			dict_array[count] = (char *)malloc((newline_pos + 1) * sizeof(char));
+			
+			if (dict_array[count] == NULL) {
+                fprintf(stderr, "Memory allocation failed\n");
+                
+                for (int j = 0; j < count; ++j) {
+                    free(dict_array[j]);
+					close(fd);
+					return dict_array;
+                }
+			}
+
+			strcpy(dict_array[count], buffer);
+
+		if (DEBUG){
+			printf("Most Recently Read word: %s \n", dict_array[count]);
+		}
+			count++;
+		}
+
+
+		//EVERYTHIGN BEFORE THIS FOR SURE WORKSb - this is in progress edge case when EOF is reached
+		else if (bytes_read > 0){
+			for (int i = 0; i < bytes_read; ++i) {
+            if (buffer[i] == '\0') {
+                newline_pos = i;
+                break;
+            }
+        }
+		buffer[newline_pos] = '\0';
+			dict_array[count] = (char *)malloc((newline_pos + 1) * sizeof(char));
+			
+			if (dict_array[count] == NULL) {
+                fprintf(stderr, "Memory allocation failed\n");
+                
+                for (int j = 0; j < count; ++j) {
+                    free(dict_array[j]);
+					close(fd);
+					return dict_array;
+                }
+			}
+
+			strcpy(dict_array[count], buffer);
+
+		if (DEBUG){
+			printf("Most Recently Read word: %s \n", dict_array[count]);
+		}
+			count++;
+		}
+
+		//THIS ALSO WORKS
+		off_t current_pos = lseek(fd, 0, SEEK_CUR);  // Get current position
+		off_t seek_pos = current_pos - (bytes_read - newline_pos - 1);
+		lseek(fd, seek_pos, SEEK_SET);
+	}
+
 
     // while (fgets(buffer, MAX_WORD_LENGTH, file) != NULL) {
     //     buffer[strcspn(buffer, "\n")] = 0;
@@ -109,8 +191,9 @@ char **read_dictionary(const char *path, int *word_count) {
     // }
 
     // fclose(file);
+	close(fd);
     *word_count = count;
-    return words;
+    return dict_array;
 }
 
 // test push
