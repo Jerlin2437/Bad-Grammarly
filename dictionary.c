@@ -78,6 +78,7 @@ int find_dictlength(int fd) {
 
 //currently there is an infinite loop from the lseek at the end of the read
 char **read_dictionary(const char *path, int *word_count) {
+	
     int fd = open(path, O_RDONLY);
     if (fd < 0) {
         perror(path);
@@ -104,10 +105,13 @@ char **read_dictionary(const char *path, int *word_count) {
 	//will simply do buffer size to max word length 
 	//we can possibly find the max word length when we run dictLength 
 	char buffer[MAX_WORD_LENGTH];
+	
     int count = 0;
     ssize_t bytes_read;
 
     while ((bytes_read = (read(fd, buffer, MAX_WORD_LENGTH - 1))) > 0) {
+		printf("Bytes Read: %d\n", bytes_read);
+		buffer[bytes_read] = '\0';
 		int newline_pos = -1;
         for (int i = 0; i < bytes_read; ++i) {
             if (buffer[i] == '\n') {
@@ -139,15 +143,16 @@ char **read_dictionary(const char *path, int *word_count) {
 		}
 
 
-		//EVERYTHIGN BEFORE THIS FOR SURE WORKSb - this is in progress edge case when EOF is reached
+		//edge case when EOF is reached
 		else if (bytes_read > 0){
-			for (int i = 0; i < bytes_read; ++i) {
-            if (buffer[i] == '\0') {
-                newline_pos = i;
-                break;
-            }
+			//bytes_read+1 because we set buffer[bytes_read] = '\0' earlier so doing bytes_read wont read it
+			for (int i = 0; i < bytes_read+1; ++i) {
+            	if (buffer[i] == '\0') {
+                	newline_pos = i;
+                	break;
+            	}
         }
-		buffer[newline_pos] = '\0';
+			buffer[newline_pos] = '\0';
 			dict_array[count] = (char *)malloc((newline_pos + 1) * sizeof(char));
 			
 			if (dict_array[count] == NULL) {

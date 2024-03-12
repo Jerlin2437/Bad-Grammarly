@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     char **dictionary = read_dictionary(argv[1], &word_count);
 
     printf("Total words read: %d\n", word_count);
-    for (int i = 0; i < word_count && i < 10; i++) {
+    for (int i = 0; i < word_count && i < word_count; i++) {
         printf("%s\n", dictionary[i]);
     }
 
