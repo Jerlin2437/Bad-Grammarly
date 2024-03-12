@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     }
 
     char **dictionary = read_dictionary(fd, &word_count);
-    
+
     if (DEBUG) {
         printf("Total words read: %d\n", word_count);
         for (int i = 0; i < word_count && i < word_count; i++) {
@@ -32,13 +32,17 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // printf(dictionary);
-    int result = binary_search(fd, dictionary, "cry");
-    printf("result is: %d\n", result);
+    int result = binary_search(fd, dictionary, "APPLE");
+    if (result >= 0) {
+        printf("FOUND\n");
+    } else {
+        printf("FALSE\n");
+    }
 
     for (int i = 0; i < word_count; i++) {
         free(dictionary[i]);
     }
     free(dictionary);
+    close(fd);
     return 0;
 }

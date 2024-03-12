@@ -7,6 +7,7 @@
 #include <string.h>
 
 static char **dict_array;
+static int numlines;
 
 #ifndef DEBUG
 #define DEBUG 0
@@ -86,7 +87,8 @@ char **read_dictionary(int fd, int *word_count) {
     // }
 
     // char **words = (char **)malloc(INITIAL_ARRAY_SIZE * sizeof(char *));
-	int numlines = find_dictlength(fd);
+	numlines = find_dictlength(fd);
+	// printf("numlines (line 90): %d\n", numlines);
 	
 	// printf("Numlines: %d\n", numlines);
 
@@ -179,31 +181,15 @@ char **read_dictionary(int fd, int *word_count) {
 		lseek(fd, seek_pos, SEEK_SET);
 	}
 
-
-    // while (fgets(buffer, MAX_WORD_LENGTH, file) != NULL) {
-    //     buffer[strcspn(buffer, "\n")] = 0;
-    //     words[count] = allocate_and_copy_word(buffer);
-    //     if (words[count] == NULL) {
-    //         fprintf(stderr, "Memory allocation for word failed\n");
-    //         fclose(file);
-    //         for (int i = 0; i < count; i++) {
-    //             free(words[i]);
-    //         }
-    //         free(words);
-    //         return NULL;
-    //     }
-    //     count++;
-    // }
-
-    // fclose(file);
-	close(fd);
+	// close(fd);
     *word_count = count;
     return dict_array;
 }
 
-int binary_search(int fd, char **dict, char *target) {
+int binary_search(int dict_size, char **dict, char *target) {
 	int lo = 0;
-	int hi = find_dictlength(fd) - 1;
+	int hi = numlines - 1;
+
 	while (lo <= hi) {
 		int mid = lo + (hi - lo) / 2;
 		int comparison = strcmp(dict[mid], target);
@@ -219,12 +205,3 @@ int binary_search(int fd, char **dict, char *target) {
 	}
 	return -1;
 }
-
-// void print_dict(char **dict) {
-// 	int len = find_dictlength(dict);
-// 	for (int i = 0; i < len; i++) {
-// 		printf("%s", dict_array[i]);
-// 	}
-// }
-
-// test push
