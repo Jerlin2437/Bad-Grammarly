@@ -6,4 +6,5 @@
 #define INITIAL_ARRAY_SIZE 104335 // Adjust as necessary
 
 char *allocate_and_copy_word(const char *);
-char **read_dictionary(const char *, int *);
+char **read_dictionary(int, int *);
+int binary_search(int, char **, char *);

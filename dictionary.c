@@ -9,7 +9,7 @@
 static char **dict_array;
 
 #ifndef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 #endif
 
 #ifndef BUFLENGTH
@@ -77,18 +77,18 @@ int find_dictlength(int fd) {
 
 
 //currently there is an infinite loop from the lseek at the end of the read
-char **read_dictionary(const char *path, int *word_count) {
+char **read_dictionary(int fd, int *word_count) {
 	
-    int fd = open(path, O_RDONLY);
-    if (fd < 0) {
-        perror(path);
-        exit(EXIT_FAILURE);
-    }
+    // int fd = open(path, O_RDONLY);
+    // if (fd < 0) {
+    //     perror(path);
+    //     exit(EXIT_FAILURE);
+    // }
 
     // char **words = (char **)malloc(INITIAL_ARRAY_SIZE * sizeof(char *));
 	int numlines = find_dictlength(fd);
 	
-	printf("Numlines: %d\n", numlines);
+	// printf("Numlines: %d\n", numlines);
 
 	dict_array = (char **) malloc(numlines * sizeof(char *));
     if (dict_array == NULL) {
@@ -110,7 +110,7 @@ char **read_dictionary(const char *path, int *word_count) {
     ssize_t bytes_read;
 
     while ((bytes_read = (read(fd, buffer, MAX_WORD_LENGTH - 1))) > 0) {
-		printf("Bytes Read: %d\n", bytes_read);
+		// printf("Bytes Read: %d\n", bytes_read);
 		buffer[bytes_read] = '\0';
 		int newline_pos = -1;
         for (int i = 0; i < bytes_read; ++i) {
@@ -200,5 +200,31 @@ char **read_dictionary(const char *path, int *word_count) {
     *word_count = count;
     return dict_array;
 }
+
+int binary_search(int fd, char **dict, char *target) {
+	int lo = 0;
+	int hi = find_dictlength(fd) - 1;
+	while (lo <= hi) {
+		int mid = lo + (hi - lo) / 2;
+		int comparison = strcmp(dict[mid], target);
+
+		if (comparison == 0) {
+			return mid;
+		} else if (comparison < 0) {
+			lo = mid + 1;
+		}
+		else {
+			hi = mid - 1;
+		}
+	}
+	return -1;
+}
+
+// void print_dict(char **dict) {
+// 	int len = find_dictlength(dict);
+// 	for (int i = 0; i < len; i++) {
+// 		printf("%s", dict_array[i]);
+// 	}
+// }
 
 // test push
