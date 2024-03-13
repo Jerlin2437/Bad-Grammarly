@@ -102,12 +102,11 @@ char **read_dictionary(int fd, int *word_count) {
 	//this is a cool posix function that lets you set the read position back to the beginning
 	lseek(fd, 0, SEEK_SET);
 	
-	//qsort(dict_array);
+
 
 	//will simply do buffer size to max word length 
 	//we can possibly find the max word length when we run dictLength 
 	char buffer[MAX_WORD_LENGTH];
-	
     int count = 0;
     ssize_t bytes_read;
 
@@ -115,6 +114,7 @@ char **read_dictionary(int fd, int *word_count) {
 		// printf("Bytes Read: %d\n", bytes_read);
 		buffer[bytes_read] = '\0';
 		int newline_pos = -1;
+
         for (int i = 0; i < bytes_read; ++i) {
             if (buffer[i] == '\n') {
                 newline_pos = i;
@@ -125,38 +125,34 @@ char **read_dictionary(int fd, int *word_count) {
 		if (newline_pos != -1){
 			buffer[newline_pos] = '\0';
 			dict_array[count] = (char *)malloc((newline_pos + 1) * sizeof(char));
-			
 			if (dict_array[count] == NULL) {
                 fprintf(stderr, "Memory allocation failed\n");
-                
                 for (int j = 0; j < count; ++j) {
                     free(dict_array[j]);
 					close(fd);
 					return dict_array;
                 }
 			}
-
 			strcpy(dict_array[count], buffer);
 
 		if (DEBUG){
 			printf("Most Recently Read word: %s \n", dict_array[count]);
 		}
+
 			count++;
 		}
 
 
 		//edge case when EOF is reached
 		else if (bytes_read > 0){
-			//bytes_read+1 because we set buffer[bytes_read] = '\0' earlier so doing bytes_read wont read it
 			for (int i = 0; i < bytes_read+1; ++i) {
             	if (buffer[i] == '\0') {
                 	newline_pos = i;
                 	break;
             	}
-        }
+        	}
 			buffer[newline_pos] = '\0';
 			dict_array[count] = (char *)malloc((newline_pos + 1) * sizeof(char));
-			
 			if (dict_array[count] == NULL) {
                 fprintf(stderr, "Memory allocation failed\n");
                 
@@ -175,7 +171,6 @@ char **read_dictionary(int fd, int *word_count) {
 			count++;
 		}
 
-		//THIS ALSO WORKS
 		off_t current_pos = lseek(fd, 0, SEEK_CUR);  // Get current position
 		off_t seek_pos = current_pos - (bytes_read - newline_pos - 1);
 		lseek(fd, seek_pos, SEEK_SET);
@@ -188,7 +183,7 @@ char **read_dictionary(int fd, int *word_count) {
 
 int binary_search(int dict_size, char **dict, char *target) {
 	int lo = 0;
-	int hi = numlines - 1;
+	int hi = dict_size - 1;
 
 	while (lo <= hi) {
 		int mid = lo + (hi - lo) / 2;
