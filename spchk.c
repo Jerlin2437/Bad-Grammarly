@@ -1,6 +1,7 @@
 #define _GNU_SOURCE
 
 #include "dictionary.h"
+#include "readFile.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,106 +13,11 @@
 #ifndef DEBUG
 #define DEBUG 1
 #endif
-static int num_text_files;
 static char *file_paths;
-static int file_pos_count = 0;
 
-void save_paths(char *path) {
-    file_paths[file_pos_count++] = strdup(path);
-    if (file_paths[file_pos_count - 1] == NULL) {
-        perror("Error allocating memory\n");
-        exit(EXIT_FAILURE);
-    }
-}
+//Only a function declaration so far of readFile, which readsTxt file and executes it
+void readFile(const char *filePath);
 
-void traverse_dirs(char *path) {
-    DIR *dir;
-    struct dirent *entry;
-
-    // Open the directory
-    dir = opendir(path);
-    if (dir == NULL) {
-        perror("Error opening directory");
-        exit(EXIT_FAILURE);
-    }
-
-    // Read directory entries
-    while ((entry = readdir(dir)) != NULL) {
-        // Skip '.' and '..'
-        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            // Construct the full path of the entry
-            char *fullpath = malloc(strlen(path) + strlen(entry->d_name) + 2);  // +2 for '/' and '\0'
-            if (fullpath == NULL) {
-                perror("Error allocating memory");
-                exit(EXIT_FAILURE);
-            }
-            sprintf(fullpath, "%s/%s", path, entry->d_name);
-
-            // If the entry is a subdirectory, recursively traverse it
-            struct stat entryStat;
-            if (stat(fullpath, &entryStat) == 0 && S_ISDIR(entryStat.st_mode)) {
-                /////////// NOTE: I COMMENTED THIS OUT BECAUSE TRAVERSE DIRECTORIES DOES NOT EXIST YET
-                //traverseDirectories(fullpath);
-            } else if (strstr(entry->d_name, ".txt") != NULL) {
-                // Print the path of the text file
-                // printf("Text file: %s\n", fullpath);
-                // save_path(fullpath);
-                num_text_files += 1;
-            }
-
-            // Free the allocated memory
-            free(fullpath);
-        }
-    }
-
-    // Close the directory
-    closedir(dir);
-}
-
-void count_text_files_from_path(char *path) {
-    DIR *dir;
-    struct dirent *entry;
-
-    // Open the directory
-    dir = opendir(path);
-    if (dir == NULL) {
-        fprintf(stderr, "Cannot open directory '%s'\n", path);
-        return;
-    }
-
-    // Read directory entries
-    while ((entry = readdir(dir)) != NULL) {
-        // Skip '.' and '..'
-        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-            // Construct the full path of the entry
-            char *fullpath = malloc(strlen(path) + strlen(entry->d_name) + 2);  // +2 for '/' and '\0'
-            if (fullpath == NULL) {
-                perror("Error allocating memory");
-                exit(EXIT_FAILURE);
-            }
-            sprintf(fullpath, "%s/%s", path, entry->d_name);
-
-            // If the entry is a subdirectory, recursively traverse it
-            struct stat entryStat;
-            if (stat(fullpath, &entryStat) == 0 && S_ISDIR(entryStat.st_mode)) {
-
-                /////////// NOTE: I COMMENTED THIS OUT BECAUSE TRAVERSE DIRECTORIES DOES NOT EXIST YET
-                //traverseDirectories(fullpath);
-            } else if (strstr(entry->d_name, ".txt") != NULL) {
-                // Print the path of the text file
-                // printf("Text file: %s\n", fullpath);
-                // save_path(fullpath);
-                num_text_files += 1;
-            }
-
-            // Free the allocated memory
-            free(fullpath);
-        }
-    }
-
-    // Close the directory
-    closedir(dir);
-}
 
 //works - j 3.13
 void findTxtFiles(const char *dirPath) {
@@ -177,21 +83,29 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // process text files passed in:
-    file_paths = (char *) malloc (num_text_files * sizeof(char *));
-    if (file_paths == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        free(dictionary);
-        close(fdDict);
-        return NULL;
-    }
+// This block of code discerns whether or not argv[x] is a file or directory
+    struct stat path_stat;
+    for (int i = 2; i < argc; i++) {
+        if (stat(argv[i], &path_stat) == -1) {
+            perror("stat failed");
+            continue;
+        }
 
-    for (int i = 1; i <= argc; i++) {
-        
+        if (S_ISREG(path_stat.st_mode)) {
+            
+            // It's a regular file
+            printf("We've found a regular file: %s\n", argv[i]);
+           // readFile(argv[i]);
+        } else if (S_ISDIR(path_stat.st_mode)) {
+            // It's a directory
+            findTxtFiles(argv[i]);
+        } else {
+            fprintf(stderr, "%s is not a regular file or directory\n", argv[i]);
+        }
     }
 
 //prints out txt files in given direrctory (argv2)
-    findTxtFiles(argv[2]);
+ 
 //works -j 3/13
     // int result = binary_search(word_count, dictionary, "ABSTRACT");
     // if (result >= 0) {
