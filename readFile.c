@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #ifndef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 #endif
 
 #ifndef BUFSIZE
@@ -25,7 +25,16 @@ static int col_pos;
 // this function will be to take the inputted word and test whether or not it is in the dictionary or not
 // return val: int for true or false
 int validate_word(char *word) {
+    if (DEBUG) {
+        printf("Validating Word: %s\n", word);
+    }
+    int result = binary_search(wordCount, dict_array, word);
+    if (result != -1){
+        printf("We found the word, it is number %d in the dictionary.\n", result);
+    }
+    else {
 
+    }
 }
 
 void parse_line(char *path, char *line) {
@@ -75,7 +84,7 @@ void parse_line(char *path, char *line) {
             // for (int i = 0; i < 7; i++) {
             //     printf("%c", word[i]);
             // }
-            // int result = validate_word(word); /////////////////// this line is where we'll pass the word to validate if its in the dict.
+        //    int result = validate_word(word); /////////////////// this line is where we'll pass the word to validate if its in the dict.
             free(word);
             // return;
             // printf("col_pos (inside if): %d\n", col_pos);

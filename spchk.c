@@ -68,7 +68,7 @@ void findTxtFiles(const char *dirPath) {
             // Check if the file name ends with ".txt" and does not start with '.'
             char *ext = strrchr(entry->d_name, '.');
             if (ext && strcmp(ext, ".txt") == 0 && entry->d_name[0] != '.') {
-                // printf("Found text file: %s\n", fullPath);
+                printf("Found text file: %s, now parsing...\n", fullPath);
                 // save_path(fullPath);
                 parse_file(fullPath);
             }
@@ -103,12 +103,12 @@ int main(int argc, char *argv[]) {
 
     char **dictionary = read_dictionary(fdDict, &word_count);
 
-    // if (DEBUG) {
-    //     printf("Total words read: %d\n", word_count);
-    //     for (int i = 0; i < word_count && i < word_count; i++) {
-    //         printf("%s\n", dictionary[i]);
-    //     }
-    // }
+    if (DEBUG) {
+        printf("Total words read in spchk.c: %d\n", word_count);
+        for (int i = 0; i < word_count && i < word_count; i++) {
+            printf("%s\n", dictionary[i]);
+        }
+    }
 
 // This block of code discerns whether or not argv[x] is a file or directory
     struct stat path_stat;
@@ -122,9 +122,11 @@ int main(int argc, char *argv[]) {
             
             // It's a regular file
             printf("We've found a regular file: %s\n", argv[i]);
+            parse_file(argv[i]);
            // readFile(argv[i]);
         } else if (S_ISDIR(path_stat.st_mode)) {
             // It's a directory
+            printf("We've found a directory: %s\n", argv[i]);
             findTxtFiles(argv[i]);
         } else {
             fprintf(stderr, "%s is not a regular file or directory\n", argv[i]);

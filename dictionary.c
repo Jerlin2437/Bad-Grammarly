@@ -6,8 +6,9 @@
 #include <fcntl.h>
 #include <string.h>
 
-static char **dict_array;
-static int numlines;
+char **dict_array;
+int numlines;
+int wordCount;
 
 #ifndef DEBUG
 #define DEBUG 0
@@ -178,6 +179,7 @@ char **read_dictionary(int fd, int *word_count) {
 
 	// close(fd);
     *word_count = count;
+	wordCount = count;
     return dict_array;
 }
 

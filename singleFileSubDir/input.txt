@@ -1,2 +1,2 @@
 trying to print
-Dog
+Dog and there are no spaces

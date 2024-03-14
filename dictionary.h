@@ -5,6 +5,8 @@
 #define MAX_WORD_LENGTH 100
 #define INITIAL_ARRAY_SIZE 104335 // Adjust as necessary
 
+extern int wordCount;
+extern char **dict_array;
 char *allocate_and_copy_word(const char *);
 char **read_dictionary(int, int *);
 int find_dictlength(int);
