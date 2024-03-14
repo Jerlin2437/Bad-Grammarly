@@ -23,15 +23,65 @@ static int row_pos;
 static int col_pos;
 static int word_start_pos;
 
-// this function will be to take the inputted word and test whether or not it is in the dictionary or not
-// return val: int for true or false
-int validate_word(char *word) {
+char* strip(char *word) {
+    char *end;
+
+    // Trim leading characters
+    while (strchr("'\"([{", *word)) word++;
+
+    // Trim trailing punctuation
+    end = word + strlen(word) - 1;
+    while (end > word && ispunct((unsigned char)*end)) end--;
+
+    // Write new null terminator
+    *(end + 1) = 0;
+
+    return word;
+}
+
+// Function to convert word to lowercase for comparison
+char* to_lowercase(const char *word) {
+    char *lowercase = malloc(strlen(word) + 1);
+    if (!lowercase) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; word[i]; i++) {
+        lowercase[i] = tolower(word[i]);
+    }
+    lowercase[strlen(word)] = '\0';
+
+    return lowercase;
+}
+
+// hyphenated word
+int validate_component(char *component) {
+    char *lowercase_component = to_lowercase(component);
+    int result = binary_search(wordCount, dict_array, lowercase_component);
+    free(lowercase_component);
+    return result;
+}
+
+// Enhanced validate_word function
+int validate_word(char *word, char *path, int word_start_col) {
     if (DEBUG) {
         printf("Validating Word: %s\n", word);
     }
-    int result = binary_search(wordCount, dict_array, word);
-    return result;
 
+    word = strip(word);
+
+    // Check for hyphenated words
+    char *hyphenated = strtok(word, "-");
+    while (hyphenated) {
+        if (validate_component(hyphenated) == -1) {
+            printf("%s (%d,%d): %s\n", path, row_pos, word_start_col, word);
+            return FALSE;
+        }
+        hyphenated = strtok(NULL, "-");
+    }
+
+    return TRUE;
 }
 
 void parse_line(char *path, char *line) {
@@ -82,10 +132,8 @@ void parse_line(char *path, char *line) {
             // for (int i = 0; i < 7; i++) {
             //     printf("%c", word[i]);
             // }
-            int result = validate_word(word); /////////////////// this line is where we'll pass the word to validate if its in the dict.
-            if (result == -1){
-                printf("%s (%d,%d): %s\n", path, row_pos, word_start_pos, word);
-            }
+            int result = validate_word(word, path, word_start_pos); /////////////////// this line is where we'll pass the word to validate if its in the dict.
+
             
             free(word);
             // return;
