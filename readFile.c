@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #ifndef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 #endif
 
 #ifndef BUFSIZE
@@ -21,6 +21,7 @@
 
 static int row_pos;
 static int col_pos;
+static int word_start_pos;
 
 // this function will be to take the inputted word and test whether or not it is in the dictionary or not
 // return val: int for true or false
@@ -29,15 +30,12 @@ int validate_word(char *word) {
         printf("Validating Word: %s\n", word);
     }
     int result = binary_search(wordCount, dict_array, word);
-    if (result != -1){
-        printf("We found the word, it is number %d in the dictionary.\n", result);
-    }
-    else {
+    return result;
 
-    }
 }
 
 void parse_line(char *path, char *line) {
+    word_start_pos = 0;
     // printf("row |%d| --> %s\n",row_pos, line);
 
     // edge case: whitespace before '\0' <-- null terminator (these two kind of go hand in hand)
@@ -69,7 +67,7 @@ void parse_line(char *path, char *line) {
             // if (*ptr == '\0') {
             //     return; // or break maybe ??? idk yet
             // }
-
+            word_start_pos += 1;
             int word_size = col_pos - offset;
             offset = col_pos;
             // printf("word_size: %d\n", word_size);
@@ -84,7 +82,11 @@ void parse_line(char *path, char *line) {
             // for (int i = 0; i < 7; i++) {
             //     printf("%c", word[i]);
             // }
-        //    int result = validate_word(word); /////////////////// this line is where we'll pass the word to validate if its in the dict.
+            int result = validate_word(word); /////////////////// this line is where we'll pass the word to validate if its in the dict.
+            if (result == -1){
+                printf("%s (%d,%d): %s\n", path, row_pos, word_start_pos, word);
+            }
+            
             free(word);
             // return;
             // printf("col_pos (inside if): %d\n", col_pos);
@@ -100,6 +102,7 @@ void parse_line(char *path, char *line) {
         // }
         ptr     += 1;
         col_pos += 1;
+        
         // need to move prev pointer (or maybe pointers) correctly here
     }
 
