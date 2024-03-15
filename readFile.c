@@ -176,56 +176,90 @@ void parse_line(char *path, char *line) {
     // printf("row |%d| --> %s\n",row_pos, line);
 
     int word_start_pos = 1;
+    int count = 1; // counting letters in word
     int offset = 0;
     char *word;
     char *ptr = line;
     char *prev = ptr;
     while (*ptr != '\0') {
-        if (isspace(*ptr)) { // if we found a whitespace character take the found word and validate it
-            
-            // NOTE: will need to work something in here where it deals with more than 1 whitespace
-            // character after finding a word, something like:
-            // if (isspace(*ptr) && *ptr != '\0') {
-            //     while (isspace(*ptr)) {
-            //         ptr += 1;
-            //         col_pos += 1;
-            //     }
-            //     prev = ptr;
-            // } else {
-            //     ptr += 1;
-            //     prev = ptr;
-            //     col_pos += 1;
-            // }
-            // if (*ptr == '\0') {
-            //     return; // or break maybe ??? idk yet
-            // }
 
-            
-            int word_size = col_pos - offset;
-            offset = col_pos;
-            // printf("word_size: %d\n", word_size);
-            // printf("offset: %d\n", offset);
-            word = (char *) malloc(sizeof(char) * word_size);
-            strncpy(word, prev, word_size);
-            word[word_size-1] = '\0';
-
-            // printf("inside: %s\n", word);
-            // int result = validate_word(word);
-            int result = validate_word(word, path, word_start_pos);
-            // if (result == FALSE) {
-            //     printf("%s (%d,%d): %s\n", path, row_pos, word_start_pos, word);
-            // }
-
-
-            free(word);
-            word_start_pos += 1;
+        while (isspace(*ptr) && *ptr != '\0') {
             ptr += 1;
-            prev = ptr;
             col_pos += 1;
         }
-        ptr     += 1;
-        col_pos += 1;
+        prev = ptr;
+
+        if (*ptr == '\0') break;
+
+        word_start_pos = col_pos;
+        count = 1;                  // reset word count per word
+        while (!isspace(*ptr) && *ptr != '\0') {
+            count += 1;
+            ptr += 1;
+            col_pos += 1;
+        }
+
+        if (*ptr == '\0') break;
+
+        // if (count > 0) {
+        //     word = (char *) malloc(sizeof(char) * count);
+        //     word[count-1] = '\0';
+        //     int result = validate_word(word, path, word_start_pos);
+        //     free(word);
+        // }
+        word = (char *) malloc(sizeof(char) * count);
+        word[count-1] = '\0';
+        int result = validate_word(word, path, word_start_pos);
+        free(word);
+        
+
+
+        // if (!isspace(*ptr)) { // if we found a whitespace character take the found word and validate it
+            
+        //     // NOTE: will need to work something in here where it deals with more than 1 whitespace
+        //     // character after finding a word, something like:
+        //     // if (isspace(*ptr) && *ptr != '\0') {
+        //     //     while (isspace(*ptr)) {
+        //     //         ptr += 1;
+        //     //         col_pos += 1;
+        //     //     }
+        //     //     prev = ptr;
+        //     // } else {
+        //     //     ptr += 1;
+        //     //     prev = ptr;
+        //     //     col_pos += 1;
+        //     // }
+        //     // if (*ptr == '\0') {
+        //     //     return; // or break maybe ??? idk yet
+        //     // }
+
+        //     word_start_pos = col_pos;
+        //     int word_size = col_pos - offset;
+        //     offset = col_pos;
+        //     // printf("word_size: %d\n", word_size);
+        //     // printf("offset: %d\n", offset);
+        //     word = (char *) malloc(sizeof(char) * word_size);
+        //     strncpy(word, prev, word_size);
+        //     word[word_size-1] = '\0';
+
+        //     // printf("inside: %s\n", word);
+        //     // int result = validate_word(word);
+        //     int result = validate_word(word, path, word_start_pos);
+        //     // if (result == FALSE) {
+        //     //     printf("%s (%d,%d): %s\n", path, row_pos, word_start_pos, word);
+        //     // }
+
+        //     free(word);
+        //     word_start_pos += 1;
+        //     ptr += 1;
+        //     prev = ptr;
+        //     col_pos += 1;
+        // }
+        // ptr     += 1;
+        // col_pos += 1;
     }
+
+    // NOTE: will need to check this after reworking above
     if (*ptr == '\0') {
         int word_size = col_pos - offset;
         offset = col_pos;
