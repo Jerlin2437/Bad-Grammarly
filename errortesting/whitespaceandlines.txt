@@ -1,0 +1,7 @@
+        This is to test
+how         the program
+wile behave
+
+when dealing with different
+kinds    
+of                      whitespace

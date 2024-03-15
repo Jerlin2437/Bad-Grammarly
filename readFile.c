@@ -65,14 +65,29 @@ int validate_component(char *component) {
 
 // Enhanced validate_word function
 int validate_word(char *word, char *path, int word_start_col) {
+// int validate_word(char *word) {
     if (DEBUG) {
         printf("Validating Word: %s\n", word);
     }
 
+
     word = strip(word);
+
+    // printf("word: %s\n", word);
+    // return FALSE;
+    // printf("wordcount: %d\n", wordCount);
+
+    // int result = binary_search(wordCount, dict_array, word);
+    // if (result == -1) {
+    //     return FALSE;
+    // } else {
+    //     return TRUE;
+    // }
+    
 
     // Check for hyphenated words
     char *hyphenated = strtok(word, "-");
+    // printf("hyphen: %s\n", hyphenated);
     while (hyphenated) {
         if (validate_component(hyphenated) == -1) {
             printf("%s (%d,%d): %s\n", path, row_pos, word_start_col, word);
@@ -85,22 +100,89 @@ int validate_word(char *word, char *path, int word_start_col) {
 }
 
 void parse_line(char *path, char *line) {
-    word_start_pos = 0;
+    
+    // // edge case: whitespace before '\0' <-- null terminator (these two kind of go hand in hand)
+    // // edge case: line starts with white space and line is only whitespace
+    // // edge case: lots of white space between words
+    
+    // // printf("col_pos: %d\n", col_pos);
+    // int offset = 0;
+    // char *word;
+    // char *ptr = line;
+    // char *prev = ptr;
+    // while (*ptr != '\0') {
+    //     // printf("col_pos (inside loop): %d\n", col_pos);
+    //     if (isspace(*ptr)) { // if we found a whitespace character take the found word and validate it
+    //         // NOTE: will need to work something in here where it deals with more than 1 whitespace
+    //         // character after finding a word, something like:
+    //         // if (isspace(*(ptr + 1)) && *ptr != '\0') {
+    //         //     while (isspace(*ptr)) {
+    //         //         ptr += 1;
+    //         //         col_pos += 1;
+    //         //     }
+    //         //     prev = ptr;
+    //         // } else {
+    //         //     ptr += 1;
+    //         //     prev = ptr;
+    //         //     col_pos += 1;
+    //         // }
+    //         // if (*ptr == '\0') {
+    //         //     return; // or break maybe ??? idk yet
+    //         // }
+    //         word_start_pos += 1;
+    //         int word_size = col_pos - offset;
+    //         offset = col_pos;
+    //         // printf("word_size: %d\n", word_size);
+    //         // printf("offset: %d\n", offset);
+    //         word = (char *) malloc(sizeof(char) * word_size);
+    //         // i think either strncpy or memcpy works here
+    //         strncpy(word, prev, word_size);
+    //         // memcpy(word, prev, col_pos);
+    //         word[word_size-1] = '\0';
+    //         printf("%s\n", word);
+    //         // for (int i = 0; i < 7; i++) {
+    //         //     printf("%c", word[i]);
+    //         // }
+    //         // int result = validate_word(word, path, word_start_pos); /////////////////// this line is where we'll pass the word to validate if its in the dict.
+    //         // int result = validate_word(word);
+    //         free(word);
+    //         // return;
+    //         // printf("col_pos (inside if): %d\n", col_pos);
+    //         // NOTE: might need to work samething  here where it deals with more than 1 whitespace
+    //         // character after finding a word, something like (but above might already take care of that)
+    //         ptr += 1;
+    //         prev = ptr;
+    //         col_pos += 1;
+    //     }
+    //     // if (*ptr == '\0') {
+    //     // }
+    //     ptr     += 1;
+    //     col_pos += 1;
+    //     // need to move prev pointer (or maybe pointers) correctly here
+    // }
+    // // prints the last word
+    // if (*ptr == '\0') {
+    //     int word_size = col_pos - offset;
+    //     offset = col_pos;
+    //     word = (char *) malloc(sizeof(char) * word_size);
+    //     strncpy(word, prev, word_size);
+    //     word[word_size-1] = '\0';
+    //     printf("%s\n", word);
+    //     free(word);
+    // }
+
+
+    // printf("Line to parse: %s\n", line);
     // printf("row |%d| --> %s\n",row_pos, line);
 
-    // edge case: whitespace before '\0' <-- null terminator (these two kind of go hand in hand)
-    // edge case: line starts with white space and line is only whitespace
-    // edge case: lots of white space between words
-
-    // printf("col_pos: %d\n", col_pos);
-
+    int word_start_pos = 1;
     int offset = 0;
     char *word;
     char *ptr = line;
     char *prev = ptr;
     while (*ptr != '\0') {
-        // printf("col_pos (inside loop): %d\n", col_pos);
         if (isspace(*ptr)) { // if we found a whitespace character take the found word and validate it
+            
             // NOTE: will need to work something in here where it deals with more than 1 whitespace
             // character after finding a word, something like:
             // if (isspace(*(ptr + 1)) && *ptr != '\0') {
@@ -117,59 +199,49 @@ void parse_line(char *path, char *line) {
             // if (*ptr == '\0') {
             //     return; // or break maybe ??? idk yet
             // }
-            word_start_pos += 1;
             int word_size = col_pos - offset;
             offset = col_pos;
             // printf("word_size: %d\n", word_size);
             // printf("offset: %d\n", offset);
             word = (char *) malloc(sizeof(char) * word_size);
-
-            // i think either strncpy or memcpy works here
             strncpy(word, prev, word_size);
-            // memcpy(word, prev, col_pos);
             word[word_size-1] = '\0';
-            printf("%s\n", word);
-            // for (int i = 0; i < 7; i++) {
-            //     printf("%c", word[i]);
+
+            // printf("inside: %s\n", word);
+            // int result = validate_word(word);
+            int result = validate_word(word, path, word_start_pos);
+            // if (result == FALSE) {
+            //     printf("%s (%d,%d): %s\n", path, row_pos, word_start_pos, word);
             // }
-            int result = validate_word(word, path, word_start_pos); /////////////////// this line is where we'll pass the word to validate if its in the dict.
 
-            
+
             free(word);
-            // return;
-            // printf("col_pos (inside if): %d\n", col_pos);
-
-            // NOTE: might need to work samething  here where it deals with more than 1 whitespace
-            // character after finding a word, something like (but above might already take care of that)
+            word_start_pos += 1;
             ptr += 1;
             prev = ptr;
             col_pos += 1;
         }
-        // if (*ptr == '\0') {
-
-        // }
         ptr     += 1;
         col_pos += 1;
-        
-        // need to move prev pointer (or maybe pointers) correctly here
     }
-
-    // prints the last word
     if (*ptr == '\0') {
         int word_size = col_pos - offset;
         offset = col_pos;
         word = (char *) malloc(sizeof(char) * word_size);
         strncpy(word, prev, word_size);
-        word[word_size-1] = '\0';
-        printf("%s\n", word);
+        // word[word_size-1] = '\0';
+        // word[word_size] = '\0';
+        // printf("out: %s\n", word);
+        // int result = validate_word(word);
+        int result = validate_word(word, path, word_start_pos);
         free(word);
     }
-    
+    col_pos = 1;
 }
 
 void parse_file(char *path) {
 
-    // printf("from parse file: %s\n", path);
+    // // printf("from parse file: %s\n", path);
 
     row_pos = 1;
     col_pos = 1;
@@ -199,6 +271,7 @@ void parse_file(char *path) {
                 // we found a line
                 buf[pos] = '\0';
                 parse_line(path, buf + line_start);
+                // printf("from inside while: %s\n", buf + line_start);
                 row_pos += 1;
                 line_start = pos + 1;
             }
@@ -207,7 +280,7 @@ void parse_file(char *path) {
         // no partial line
 		if (line_start == pos) {
 			pos = 0;
-			// printf("no partial line\n");
+			// printf("no partial line: %s\n", buf);
 			// partial line
 			// move segment to start of buffer and refill remaining buffer
 		} else if (line_start > 0) {
@@ -229,7 +302,8 @@ void parse_file(char *path) {
             buf = realloc(buf, buflength + 1);
         }
         buf[pos] = '\0';
-        parse_line(path, buf + line_start);
+        parse_line(path, buf);
+        // printf("%s\n", buf);
         row_pos += 1;
     }
 
