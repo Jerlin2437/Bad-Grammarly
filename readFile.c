@@ -185,7 +185,7 @@ void parse_line(char *path, char *line) {
             
             // NOTE: will need to work something in here where it deals with more than 1 whitespace
             // character after finding a word, something like:
-            // if (isspace(*(ptr + 1)) && *ptr != '\0') {
+            // if (isspace(*ptr) && *ptr != '\0') {
             //     while (isspace(*ptr)) {
             //         ptr += 1;
             //         col_pos += 1;
@@ -199,6 +199,8 @@ void parse_line(char *path, char *line) {
             // if (*ptr == '\0') {
             //     return; // or break maybe ??? idk yet
             // }
+
+            
             int word_size = col_pos - offset;
             offset = col_pos;
             // printf("word_size: %d\n", word_size);
