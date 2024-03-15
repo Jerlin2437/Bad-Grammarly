@@ -18,14 +18,6 @@ int wordCount;
 #define BUFLENGTH 16
 #endif
 
-char *allocate_and_copy_word(const char *word) {
-    char *new_word = (char *)malloc(strlen(word) + 1);  // +1 for the null terminator
-    if (new_word != NULL) {
-        strcpy(new_word, word);
-    }
-    return new_word;
-}
-
 int find_dictlength(int fd) {
     int result = 0;
     int buflength = BUFLENGTH;

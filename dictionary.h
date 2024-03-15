@@ -7,7 +7,6 @@
 
 extern int wordCount;
 extern char **dict_array;
-char *allocate_and_copy_word(const char *);
 char **read_dictionary(int, int *);
 int find_dictlength(int);
 int binary_search(int, char **, char *);
