@@ -1,6 +1,6 @@
-     This is
-how         the program 
-wile behave
+   This is 
+how  the program
+will behave
 
 when dealing with different
 kinds    

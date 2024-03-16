@@ -182,6 +182,7 @@ void parse_line(char *path, char *line) {
     char *ptr = line;
     char *prev = ptr;
     while (*ptr != '\0') {
+        // col_pos = 1;
 
         while (isspace(*ptr) && *ptr != '\0') {
             ptr += 1;
@@ -208,6 +209,7 @@ void parse_line(char *path, char *line) {
         //     free(word);
         // }
         word = (char *) malloc(sizeof(char) * count);
+        strncpy(word, prev, count);
         word[count-1] = '\0';
         int result = validate_word(word, path, word_start_pos);
         free(word);
@@ -259,20 +261,31 @@ void parse_line(char *path, char *line) {
         // col_pos += 1;
     }
 
+    if (prev == ptr) return;
+
     // NOTE: will need to check this after reworking above
     if (*ptr == '\0') {
-        int word_size = col_pos - offset;
-        offset = col_pos;
-        word = (char *) malloc(sizeof(char) * word_size);
-        strncpy(word, prev, word_size);
-        // word[word_size-1] = '\0';
-        // word[word_size] = '\0';
-        // printf("out: %s\n", word);
-        // int result = validate_word(word);
+
+
+        word = (char *) malloc(sizeof(char) * count);
+        strncpy(word, prev, count);
+        word[count-1] = '\0';
         int result = validate_word(word, path, word_start_pos);
         free(word);
+
+        // int word_size = col_pos - offset;
+        // offset = col_pos;
+        // word = (char *) malloc(sizeof(char) * word_size);
+        // strncpy(word, prev, word_size);
+        // // word[word_size-1] = '\0';
+        // // word[word_size] = '\0';
+        // // printf("out: %s\n", word);
+        // // int result = validate_word(word);
+        // int result = validate_word(word, path, word_start_pos);
+        // free(word);
+        // col_pos = 1;
     }
-    col_pos = 1;
+    // col_pos = 1;
 }
 
 void parse_file(char *path) {
@@ -307,6 +320,7 @@ void parse_file(char *path) {
                 // we found a line
                 buf[pos] = '\0';
                 parse_line(path, buf + line_start);
+                col_pos = 1;
                 // printf("from inside while: %s\n", buf + line_start);
                 row_pos += 1;
                 line_start = pos + 1;
