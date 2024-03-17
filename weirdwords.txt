@@ -8,3 +8,8 @@ weird word:
 [{[[}^%&#*#@]]
 /"bob"/42
 Multi tab^ ^
+DAY
+nated
+ONE
+MACDONALD
+mcDONALD

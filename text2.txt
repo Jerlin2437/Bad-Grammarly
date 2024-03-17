@@ -1,3 +1,16 @@
-This document assesses correct handling of hyphenated-words, 
-alongside varied CAPiTaliZation ScHEmes, 
-ensuring the system accurately processes diverse text formats.
+We went to McDonald for lunch.
+I found McDonald's to be very crowded.
+They opened a new mcdonald in our town.
+I prefer McDonalds without the apostrophe.
+We went to MCDONALD.
+Do you know if charlie will come today?
+It was Charlie who solved the issue.
+Most of charlies drawings are abstract.
+Everyone loves Charlie's new restaurant.
+The crowd yelled "BOO" at the performance.
+I didn't hear a Boo from the audience.
+That was a real boo moment for everyone.
+The doctor ordered an X-ray of the hand.
+My report included an x-ray analysis section.
+It's rare to see a Zulu warrior these days.
+My favorite chess opening is the zulu defense.

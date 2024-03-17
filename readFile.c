@@ -37,7 +37,6 @@ char* strip(char *word) {
 
     // Write new null terminator
     *(end + 1) = '\0';
-    printf("Trimmed Word: %s\n", word);
     return word;
 }
 
