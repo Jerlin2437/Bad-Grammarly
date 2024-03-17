@@ -94,18 +94,18 @@ int main(int argc, char *argv[]) {
 
     // open and process dictionary
     /////////// NOTE: we might have to account for argv[1] being a path to a dict outside the working directory /////////////
-    int word_count = 0;
+    int word_counts = 0;
     int fdDict = open(argv[1], O_RDONLY);
     if (fdDict < 0) {
         perror(argv[1]);
         exit(EXIT_FAILURE);
     }
 
-    char **dictionary = read_dictionary(fdDict, &word_count);
+    char **dictionary = read_dictionary(fdDict, &word_counts);
 
     if (DEBUG) {
-        printf("Total words read in spchk.c: %d\n", word_count);
-        for (int i = 0; i < word_count && i < word_count; i++) {
+        printf("Total words read in spchk.c: %d\n", word_counts);
+        for (int i = 0; i < word_counts && i < word_counts; i++) {
             printf("%s\n", dictionary[i]);
         }
     }
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
     //prints out txt files in given direrctory (argv2)
     
     //works -j 3/13
-    // int result = binary_search(word_count, dictionary, "ABSTRACT");
+    // int result = binary_search(word_counts, dictionary, "ABSTRACT");
     // if (result >= 0) {
     //     printf("FOUND\n");
     // } else {
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
 
     ////////
 
-    for (int i = 0; i < word_count; i++) {
+    for (int i = 0; i < word_counts; i++) {
         free(dictionary[i]);
     }
 

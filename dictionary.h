@@ -9,4 +9,4 @@ extern int wordCount;
 extern char **dict_array;
 char **read_dictionary(int, int *);
 int find_dictlength(int);
-int binary_search(int, char **, char *);
+int binary_search(int, char **, char *, int);

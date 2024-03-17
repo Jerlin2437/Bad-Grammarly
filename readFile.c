@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #ifndef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 #endif
 
 #ifndef BUFSIZE
@@ -54,42 +54,114 @@ char* to_lowercase(const char *word) {
 
     return lowercase;
 }
-
-// hyphenated word
-int validate_component(char *component) {
-    char *lowercase_component = to_lowercase(component);
-    int result = binary_search(wordCount, dict_array, lowercase_component);
-    free(lowercase_component);
-    return result;
+int is_all_caps(const char *str) {
+    // Iterate through each character in the string
+    for (int i = 0; str[i] != '\0'; i++) {
+        // If it's an alphabetic character and not uppercase, return false
+        if (isalpha((unsigned char)str[i]) && !isupper((unsigned char)str[i])) {
+            return FALSE;
+        }
+    }
+    // If we reach here, all alphabetic characters are uppercase
+    return TRUE;
 }
+
+char* lowercase_first_letter_new_string(const char *str) {
+    // Allocate memory for the new string
+    char *new_str = malloc(strlen(str) + 1);
+    
+    if (!new_str) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    strcpy(new_str, str);
+    
+    if (isupper((unsigned char)new_str[0])) {
+        new_str[0] = tolower((unsigned char)new_str[0]);
+    }
+    
+    return new_str;
+}
+
+char* uppercase_first_letter_new_string(const char *str) {
+    char *new_str = malloc(strlen(str) + 1);
+    
+    if (!new_str) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    strcpy(new_str, str);
+    
+    if (isupper((unsigned char)new_str[0])) {
+        new_str[0] = toupper((unsigned char)new_str[0]);
+    }
+    
+    return new_str;
+}
+
+int validate_component(char *component) {
+    if (DEBUG) {
+        printf("Validating Word: %s\n", component);
+    }
+
+// check og
+    if (binary_search(wordCount, dict_array, component, 0) != -1) {
+        return TRUE;
+    }
+
+    //lowercases the first letter
+    char *lowercase_first_letter_component = lowercase_first_letter_new_string(component);
+    if (binary_search(wordCount, dict_array, lowercase_first_letter_component, 0) != -1) {
+        free(lowercase_first_letter_component);
+        return TRUE;
+    }
+    free(lowercase_first_letter_component);  // Ensure this free happens in all cases
+
+    //if all caps
+    if (is_all_caps(component)){
+        //char *lowercase_component = to_lowercase(component);
+        //printf("LowerCase: %s\n", lowercase_component);
+        int result = binary_search(wordCount, dict_array, component, 1) != -1;
+        //free(lowercase_component);  // Free lowercase_component after it's no longer needed
+        if (result) {
+            return TRUE;
+        }
+
+        char *lowercase_component = to_lowercase(component);
+        //printf("LowerCase: %s\n", lowercase_component);
+        result = binary_search(wordCount, dict_array, lowercase_component, 1) != -1;
+        
+        if (result) {
+            free(lowercase_component); 
+            return TRUE;
+        }
+
+        char *firstUppercase = uppercase_first_letter_new_string(lowercase_component);
+        result = binary_search(wordCount, dict_array, firstUppercase, 1) != -1;
+        
+        if (result) {
+            free(lowercase_component); 
+            free(firstUppercase);
+            return TRUE;
+        }
+        free(lowercase_component); 
+        free(firstUppercase);
+    }
+
+}
+
 
 // Enhanced validate_word function
 int validate_word(char *word, char *path, int word_start_col) {
-// int validate_word(char *word) {
-    if (DEBUG) {
-        printf("Validating Word: %s\n", word);
-    }
-
-
     word = strip(word);
-
-    // printf("word: %s\n", word);
-    // return FALSE;
-    // printf("wordcount: %d\n", wordCount);
-
-    // int result = binary_search(wordCount, dict_array, word);
-    // if (result == -1) {
-    //     return FALSE;
-    // } else {
-    //     return TRUE;
-    // }
-    
 
     // Check for hyphenated words
     char *hyphenated = strtok(word, "-");
     // printf("hyphen: %s\n", hyphenated);
     while (hyphenated) {
-        if (validate_component(hyphenated) == -1) {
+        if (validate_component(hyphenated) == FALSE) {
             printf("%s (%d,%d): %s\n", path, row_pos, word_start_col, word);
             return FALSE;
         }

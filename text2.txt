@@ -1,9 +1,3 @@
-the brown
-quick
-brown
-fox
-jumps
-over
-the
-lazy
-dog
+This document assesses correct handling of hyphenated-words, 
+alongside varied CAPiTaliZation ScHEmes, 
+ensuring the system accurately processes diverse text formats.

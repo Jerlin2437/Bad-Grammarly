@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <ctype.h>
 
 char **dict_array;
 int numlines;
@@ -172,25 +173,65 @@ char **read_dictionary(int fd, int *word_count) {
 	// close(fd);
     *word_count = count;
 	wordCount = count;
+
     return dict_array;
 }
+char* makeLowercase(const char *word) {
+    char *lowercase = malloc(strlen(word) + 1);
+    if (!lowercase) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
 
-int binary_search(int dict_size, char **dict, char *target) {
+    for (int i = 0; word[i]; i++) {
+        lowercase[i] = tolower(word[i]);
+    }
+    lowercase[strlen(word)] = '\0';
+
+    return lowercase;
+}
+
+int binary_search(int dict_size, char **dict, char *target, int allCapsStatus) {
 	int lo = 0;
 	int hi = dict_size - 1;
 
-	while (lo <= hi) {
-		int mid = lo + (hi - lo) / 2;
-		int comparison = strcmp(dict[mid], target);
-
-		if (comparison == 0) {
-			return mid;
-		} else if (comparison < 0) {
-			lo = mid + 1;
+	if (!allCapsStatus) {
+		while (lo <= hi) {
+			int mid = lo + (hi - lo) / 2;
+			int comparison = strcmp(dict[mid], target);
+			if (comparison == 0) {
+				return mid;
+			} else if (comparison < 0) {
+				lo = mid + 1;
+			}
+			else {
+				hi = mid - 1;
+			}
 		}
-		else {
-			hi = mid - 1;
-		}
+		return -1;
 	}
-	return -1;
+	else {
+		char* targetLower = makeLowercase(target);
+		while (lo <= hi) {
+			int mid = lo + (hi - lo) / 2;
+			char* temp = makeLowercase(dict[mid]);
+			int comparison = strcmp(dict[mid], target);
+			int lowerComparison = strcmp(temp, targetLower);
+			//printf("OG Word: %s,Comparing Against: %s, Comparison: %d\n", target, dict[mid], comparison);
+			free(temp);
+			if (comparison == 0 || lowerComparison == 0) {
+				free(targetLower);
+				return mid;
+			} else if (comparison < 0) {
+				lo = mid + 1;
+			}
+			else {
+				hi = mid - 1;
+			}
+			
+		}
+		free(targetLower);
+		return -1;
+	}
+
 }
