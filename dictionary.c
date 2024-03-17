@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <strings.h>
 #include <ctype.h>
 
 char **dict_array;
@@ -191,11 +192,18 @@ char* makeLowercase(const char *word) {
     return lowercase;
 }
 
-int binary_search(int dict_size, char **dict, char *target, int allCapsStatus) {
+int linear_search(int dict_size, char **dict, char *target) {
+    for (int i = 0; i < dict_size; i++) {
+        if (strcasecmp(dict[i], target) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int binary_search(int dict_size, char **dict, char *target) {
 	int lo = 0;
 	int hi = dict_size - 1;
-
-	if (!allCapsStatus) {
 		while (lo <= hi) {
 			int mid = lo + (hi - lo) / 2;
 			int comparison = strcmp(dict[mid], target);
@@ -209,29 +217,4 @@ int binary_search(int dict_size, char **dict, char *target, int allCapsStatus) {
 			}
 		}
 		return -1;
-	}
-	else {
-		char* targetLower = makeLowercase(target);
-		while (lo <= hi) {
-			int mid = lo + (hi - lo) / 2;
-			char* temp = makeLowercase(dict[mid]);
-			int comparison = strcmp(dict[mid], target);
-			int lowerComparison = strcmp(temp, targetLower);
-			//printf("OG Word: %s,Comparing Against: %s, Comparison: %d\n", target, dict[mid], comparison);
-			free(temp);
-			if (comparison == 0 || lowerComparison == 0) {
-				free(targetLower);
-				return mid;
-			} else if (comparison < 0) {
-				lo = mid + 1;
-			}
-			else {
-				hi = mid - 1;
-			}
-			
-		}
-		free(targetLower);
-		return -1;
-	}
-
 }
