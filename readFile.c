@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #ifndef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 #endif
 
 #ifndef BUFSIZE
@@ -106,7 +106,7 @@ int validate_component(char *component) {
         printf("Validating Word: %s\n", component);
     }
 
-// check og
+    // check og
     if (binary_search(wordCount, dict_array, component, 0) != -1) {
         return TRUE;
     }
