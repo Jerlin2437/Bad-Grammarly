@@ -1,5 +1,5 @@
 #define _GNU_SOURCE
-
+ 
 #include "dictionary.h"
 #include "readFile.h"
 #include <stdio.h>
