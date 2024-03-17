@@ -54,6 +54,74 @@ char* to_lowercase(const char *word) {
 
     return lowercase;
 }
+
+// char* toUpperCase(char *word) {
+
+//     if (word == NULL || *word == '\0') return NULL;
+
+//     while (*word) {
+//         *word = toupper(*word);
+//         word += 1;
+//     }
+//     return word;
+// }
+
+// char* toLowercase(char *word) {
+//     if (word == NULL) {
+//         return NULL; // Return if the string is NULL
+//     }
+
+//     // Convert each character to lowercase
+//     while (*word) {
+//         *word = tolower(*word);
+//         word += 1;
+//     }
+
+//     return word;
+// }
+
+char* toUppercase(const char *str) {
+    if (str == NULL) {
+        return NULL; // Return NULL if the input string is NULL
+    }
+
+    // Allocate memory for the new string
+    size_t length = strlen(str);
+    char *uppercaseStr = (char*)malloc(length + 1); // +1 for the null terminator
+    if (uppercaseStr == NULL) {
+        return NULL; // Return NULL if memory allocation fails
+    }
+
+    // Convert each character to uppercase
+    for (size_t i = 0; i < length; i++) {
+        uppercaseStr[i] = toupper(str[i]);
+    }
+    uppercaseStr[length] = '\0'; // Null-terminate the string
+
+    return uppercaseStr;
+}
+
+char* toLowercase(const char *str) {
+    if (str == NULL) {
+        return NULL; // Return NULL if the input string is NULL
+    }
+
+    // Allocate memory for the new string
+    size_t length = strlen(str);
+    char *lowercaseStr = (char*)malloc(length + 1); // +1 for the null terminator
+    if (lowercaseStr == NULL) {
+        return NULL; // Return NULL if memory allocation fails
+    }
+
+    // Convert each character to lowercase
+    for (size_t i = 0; i < length; i++) {
+        lowercaseStr[i] = tolower(str[i]);
+    }
+    lowercaseStr[length] = '\0'; // Null-terminate the string
+
+    return lowercaseStr;
+}
+
 int is_all_caps(const char *str) {
     // Iterate through each character in the string
     for (int i = 0; str[i] != '\0'; i++) {
@@ -101,57 +169,226 @@ char* uppercase_first_letter_new_string(const char *str) {
     return new_str;
 }
 
+// char* capitalizeFirstLetterOnly(char *str) {
+//     if (str == NULL || *str == '\0') {
+//         return NULL; // Return if the string is empty or NULL
+//     }
+
+//     // Capitalize the first letter
+//     *str = toupper(*str);
+    
+//     // Convert the rest of the letters to lowercase
+//     while (*(++str)) {
+//         *str = tolower(*str);
+//     }
+//     return str;
+// }
+
+char* capitalizeFirstLetter(const char *str) {
+    if (str == NULL || *str == '\0') {
+        return NULL; // Return NULL if the input string is empty or NULL
+    }
+
+    // Allocate memory for the new string
+    size_t length = strlen(str);
+    char *newStr = (char*)malloc(length + 1); // +1 for the null terminator
+    if (newStr == NULL) {
+        return NULL; // Return NULL if memory allocation fails
+    }
+
+    // Capitalize the first letter
+    newStr[0] = toupper(str[0]);
+
+    // Convert the rest of the letters to lowercase
+    for (size_t i = 1; i < length; i++) {
+        newStr[i] = tolower(str[i]);
+    }
+    newStr[length] = '\0'; // Null-terminate the string
+
+    return newStr;
+}
+
+int contains_apostrophe(char *word) {
+    char *ptr = word;
+    while (*ptr != '\0') {
+        if (*ptr == '\'') {
+            return TRUE;
+        }
+        ptr += 1;
+    }
+    return FALSE;
+}
+
+int has_weird_caps(char *word) {
+    // int letter_count = 0;
+    // int num_cap_letters = 0;
+    // char *ptr = word;
+    // while (*ptr != '\0') {
+    //     letter_count += 1;
+    //     ptr += 1;
+    // }
+
+    // // printf("letter count: %d\n", letter_count);
+    // char *ptr2 = word;
+    // int count = 0;
+    // while (count < letter_count) {
+    //     if (isupper(*ptr2)) {
+    //         num_cap_letters += 1;
+    //     }
+    //     count += 1;
+    //     ptr2 += 1;
+    // }
+
+    // if (num_cap_letters == letter_count) {
+    //     return FALSE;
+    // } else {
+    //     return TRUE;
+    // }
+
+    if (word == NULL) {
+        return FALSE; // Return false if the input string is NULL
+    }
+
+    int capitalCount = 0;
+    int letterCount = 0;
+
+    while (*word) {
+        if (isalpha(*word)) {
+            letterCount++; // Increment letter count if character is a letter
+            if (isupper(*word)) {
+                capitalCount++; // Increment capital letter count if character is uppercase
+            }
+        }
+        word++;
+    }
+
+    int result = (capitalCount == letterCount);
+    if (result == 0) {
+        return FALSE;
+    } else {
+        return TRUE;
+    }
+    // return capitalCount == letterCount; // Return true if capital letter count equals letter count
+}
+
 int validate_component(char *component) {
     if (DEBUG) {
         printf("Validating Word: %s\n", component);
     }
 
-    // check og
-    if (binary_search(wordCount, dict_array, component, 0) != -1) {
-        return TRUE;
-    }
+    if (has_weird_caps(component) == TRUE) {            // if given a word like McDonald, check McDonald and MACDONALD 
 
-    //lowercases the first letter
-    char *lowercase_first_letter_component = lowercase_first_letter_new_string(component);
-    if (binary_search(wordCount, dict_array, lowercase_first_letter_component, 0) != -1) {
-        free(lowercase_first_letter_component);
-        return TRUE;
-    }
-    free(lowercase_first_letter_component);  // Ensure this free happens in all cases
-
-    //if all caps
-    if (is_all_caps(component)){
-        //char *lowercase_component = to_lowercase(component);
-        //printf("LowerCase: %s\n", lowercase_component);
-        int result = binary_search(wordCount, dict_array, component, 1) != -1;
-        //free(lowercase_component);  // Free lowercase_component after it's no longer needed
-        if (result) {
+        if (binary_search(wordCount, dict_array, component, 0) != -1) {
             return TRUE;
         }
+        char *uppercase = toUppercase(component);
+        if (binary_search(wordCount, dict_array, uppercase, 0) != -1) {
+            free(uppercase);
+            return TRUE;
+        }
+        free(uppercase);
+        return FALSE;
 
-        char *lowercase_component = to_lowercase(component);
-        //printf("LowerCase: %s\n", lowercase_component);
-        result = binary_search(wordCount, dict_array, lowercase_component, 1) != -1;
+    } else {                                    // if given a word like one, want to check if one, One, or ONE exists in dict.
+        // check lowercased word:
+
+        // printf("---------executed on word is: %s\n", component);
+
+        char *lowered = toLowercase(component);
+        if (binary_search(wordCount, dict_array, lowered, 0) != -1) {       // if it's found return true
+            free(lowered);
+            return TRUE;
+        }
+        free(lowered);
+        // check the first letter capitalized version:
+        char *capFirstLetter = capitalizeFirstLetter(component);
+        if (binary_search(wordCount, dict_array, capFirstLetter, 0) != -1) {    // if it's found return true
+            free(capFirstLetter);
+            return TRUE;
+        }
+        free(capFirstLetter);
+        // check all caps version
+        char *uppercase = toUppercase(component);
+        if (binary_search(wordCount, dict_array, uppercase, 0) != -1) {
+            free(uppercase);
+            return TRUE;
+        }
+        free(uppercase);
+        return FALSE;
+    }
+
+    // check og word
+    // if (binary_search(wordCount, dict_array, component, 0) != -1) {
+    //     return TRUE;
+    // }
+
+    // //lowercases the first letter
+    // char *lowercase_first_letter_component = lowercase_first_letter_new_string(component);
+    // if (binary_search(wordCount, dict_array, lowercase_first_letter_component, 0) != -1) {
+    //     free(lowercase_first_letter_component);
+    //     return TRUE;
+    // }
+    // free(lowercase_first_letter_component);  // Ensure this free happens in all cases
+    
+    // if (is_all_caps(component)) { // if all caps
+
+    //     //char *lowercase_component = to_lowercase(component);
+    //     //printf("LowerCase: %s\n", lowercase_component);
+    //     int result = binary_search(wordCount, dict_array, component, 1) != -1;
+    //     //free(lowercase_component);  // Free lowercase_component after it's no longer needed
+    //     if (result) {
+    //         return TRUE;
+    //     }
+
+    //     char *lowercase_component = to_lowercase(component);
+    //     //printf("LowerCase: %s\n", lowercase_component);
+    //     result = binary_search(wordCount, dict_array, lowercase_component, 1) != -1;
         
-        if (result) {
-            free(lowercase_component); 
-            return TRUE;
-        }
+    //     if (result) {
+    //         free(lowercase_component); 
+    //         return TRUE;
+    //     }
 
-        char *firstUppercase = uppercase_first_letter_new_string(lowercase_component);
-        result = binary_search(wordCount, dict_array, firstUppercase, 1) != -1;
+    //     char *firstUppercase = uppercase_first_letter_new_string(lowercase_component);
+    //     result = binary_search(wordCount, dict_array, firstUppercase, 1) != -1;
         
-        if (result) {
-            free(lowercase_component); 
-            free(firstUppercase);
-            return TRUE;
-        }
-        free(lowercase_component); 
-        free(firstUppercase);
-    }
+    //     if (result) {
+    //         free(lowercase_component); 
+    //         free(firstUppercase);
+    //         return TRUE;
+    //     }
+    //     free(lowercase_component); 
+    //     free(firstUppercase);
+    // // }
+    // } else if(contains_apostrophe(component) == TRUE && has_weird_caps(component) == TRUE) {
+
+    //     return 0;
+
+    // } else if(has_weird_caps(component) == TRUE) {
+
+    //     // perform bin search on the word itself:
+    //     int result = binary_search(wordCount, dict_array, component, 0);
+    //     if (result == FALSE) { // did not find og word
+    //         return FALSE;
+    //     } 
+        
+    //     // else run bin search on all caps version of word
+    //     char* upper_str = toUpperCase(component);
+    //     int res = binary_search(wordCount, dict_array, upper_str, 0);
+    //     if (res == FALSE) {
+    //         return FALSE;
+    //     } else {
+    //         return TRUE;
+    //     }
+
+    //     // return;
+    // } else if(contains_apostrophe(component)) {
+    //     return 0;
+    // }
+
+    // in case like word passed in is: aPPLe, it should accept aPPLe and APPLE
 
 }
-
 
 // Enhanced validate_word function
 int validate_word(char *word, char *path, int word_start_col) {
@@ -176,85 +413,12 @@ void parse_line(char *path, char *line) {
     // // edge case: whitespace before '\0' <-- null terminator (these two kind of go hand in hand)
     // // edge case: line starts with white space and line is only whitespace
     // // edge case: lots of white space between words
-    
-    // // printf("col_pos: %d\n", col_pos);
-    // int offset = 0;
-    // char *word;
-    // char *ptr = line;
-    // char *prev = ptr;
-    // while (*ptr != '\0') {
-    //     // printf("col_pos (inside loop): %d\n", col_pos);
-    //     if (isspace(*ptr)) { // if we found a whitespace character take the found word and validate it
-    //         // NOTE: will need to work something in here where it deals with more than 1 whitespace
-    //         // character after finding a word, something like:
-    //         // if (isspace(*(ptr + 1)) && *ptr != '\0') {
-    //         //     while (isspace(*ptr)) {
-    //         //         ptr += 1;
-    //         //         col_pos += 1;
-    //         //     }
-    //         //     prev = ptr;
-    //         // } else {
-    //         //     ptr += 1;
-    //         //     prev = ptr;
-    //         //     col_pos += 1;
-    //         // }
-    //         // if (*ptr == '\0') {
-    //         //     return; // or break maybe ??? idk yet
-    //         // }
-    //         word_start_pos += 1;
-    //         int word_size = col_pos - offset;
-    //         offset = col_pos;
-    //         // printf("word_size: %d\n", word_size);
-    //         // printf("offset: %d\n", offset);
-    //         word = (char *) malloc(sizeof(char) * word_size);
-    //         // i think either strncpy or memcpy works here
-    //         strncpy(word, prev, word_size);
-    //         // memcpy(word, prev, col_pos);
-    //         word[word_size-1] = '\0';
-    //         printf("%s\n", word);
-    //         // for (int i = 0; i < 7; i++) {
-    //         //     printf("%c", word[i]);
-    //         // }
-    //         // int result = validate_word(word, path, word_start_pos); /////////////////// this line is where we'll pass the word to validate if its in the dict.
-    //         // int result = validate_word(word);
-    //         free(word);
-    //         // return;
-    //         // printf("col_pos (inside if): %d\n", col_pos);
-    //         // NOTE: might need to work samething  here where it deals with more than 1 whitespace
-    //         // character after finding a word, something like (but above might already take care of that)
-    //         ptr += 1;
-    //         prev = ptr;
-    //         col_pos += 1;
-    //     }
-    //     // if (*ptr == '\0') {
-    //     // }
-    //     ptr     += 1;
-    //     col_pos += 1;
-    //     // need to move prev pointer (or maybe pointers) correctly here
-    // }
-    // // prints the last word
-    // if (*ptr == '\0') {
-    //     int word_size = col_pos - offset;
-    //     offset = col_pos;
-    //     word = (char *) malloc(sizeof(char) * word_size);
-    //     strncpy(word, prev, word_size);
-    //     word[word_size-1] = '\0';
-    //     printf("%s\n", word);
-    //     free(word);
-    // }
-
-
-    // printf("Line to parse: %s\n", line);
-    // printf("row |%d| --> %s\n",row_pos, line);
-
     int word_start_pos = 1;
     int count = 1; // counting letters in word
-    int offset = 0;
     char *word;
     char *ptr = line;
     char *prev = ptr;
     while (*ptr != '\0') {
-        // col_pos = 1;
 
         while (isspace(*ptr) && *ptr != '\0') {
             ptr += 1;
@@ -274,63 +438,12 @@ void parse_line(char *path, char *line) {
 
         if (*ptr == '\0') break;
 
-        // if (count > 0) {
-        //     word = (char *) malloc(sizeof(char) * count);
-        //     word[count-1] = '\0';
-        //     int result = validate_word(word, path, word_start_pos);
-        //     free(word);
-        // }
         word = (char *) malloc(sizeof(char) * count);
         strncpy(word, prev, count);
         word[count-1] = '\0';
         int result = validate_word(word, path, word_start_pos);
         free(word);
         
-
-
-        // if (!isspace(*ptr)) { // if we found a whitespace character take the found word and validate it
-            
-        //     // NOTE: will need to work something in here where it deals with more than 1 whitespace
-        //     // character after finding a word, something like:
-        //     // if (isspace(*ptr) && *ptr != '\0') {
-        //     //     while (isspace(*ptr)) {
-        //     //         ptr += 1;
-        //     //         col_pos += 1;
-        //     //     }
-        //     //     prev = ptr;
-        //     // } else {
-        //     //     ptr += 1;
-        //     //     prev = ptr;
-        //     //     col_pos += 1;
-        //     // }
-        //     // if (*ptr == '\0') {
-        //     //     return; // or break maybe ??? idk yet
-        //     // }
-
-        //     word_start_pos = col_pos;
-        //     int word_size = col_pos - offset;
-        //     offset = col_pos;
-        //     // printf("word_size: %d\n", word_size);
-        //     // printf("offset: %d\n", offset);
-        //     word = (char *) malloc(sizeof(char) * word_size);
-        //     strncpy(word, prev, word_size);
-        //     word[word_size-1] = '\0';
-
-        //     // printf("inside: %s\n", word);
-        //     // int result = validate_word(word);
-        //     int result = validate_word(word, path, word_start_pos);
-        //     // if (result == FALSE) {
-        //     //     printf("%s (%d,%d): %s\n", path, row_pos, word_start_pos, word);
-        //     // }
-
-        //     free(word);
-        //     word_start_pos += 1;
-        //     ptr += 1;
-        //     prev = ptr;
-        //     col_pos += 1;
-        // }
-        // ptr     += 1;
-        // col_pos += 1;
     }
 
     if (prev == ptr) return;
@@ -338,26 +451,14 @@ void parse_line(char *path, char *line) {
     // NOTE: will need to check this after reworking above
     if (*ptr == '\0') {
 
-
         word = (char *) malloc(sizeof(char) * count);
         strncpy(word, prev, count);
         word[count-1] = '\0';
         int result = validate_word(word, path, word_start_pos);
         free(word);
 
-        // int word_size = col_pos - offset;
-        // offset = col_pos;
-        // word = (char *) malloc(sizeof(char) * word_size);
-        // strncpy(word, prev, word_size);
-        // // word[word_size-1] = '\0';
-        // // word[word_size] = '\0';
-        // // printf("out: %s\n", word);
-        // // int result = validate_word(word);
-        // int result = validate_word(word, path, word_start_pos);
-        // free(word);
-        // col_pos = 1;
     }
-    // col_pos = 1;
+ 
 }
 
 void parse_file(char *path) {
