@@ -40,20 +40,20 @@ char* strip(char *word) {
 }
 
 // Function to convert word to lowercase for comparison
-char* to_lowercase(const char *word) {
-    char *lowercase = malloc(strlen(word) + 1);
-    if (!lowercase) {
-        fprintf(stderr, "Memory allocation failed.\n");
-        exit(EXIT_FAILURE);
-    }
+// char* to_lowercase(const char *word) {
+//     char *lowercase = malloc(strlen(word) + 1);
+//     if (!lowercase) {
+//         fprintf(stderr, "Memory allocation failed.\n");
+//         exit(EXIT_FAILURE);
+//     }
 
-    for (int i = 0; word[i]; i++) {
-        lowercase[i] = tolower(word[i]);
-    }
-    lowercase[strlen(word)] = '\0';
+//     for (int i = 0; word[i]; i++) {
+//         lowercase[i] = tolower(word[i]);
+//     }
+//     lowercase[strlen(word)] = '\0';
 
-    return lowercase;
-}
+//     return lowercase;
+// }
 
 // char* toUpperCase(char *word) {
 
@@ -220,6 +220,36 @@ int contains_apostrophe(char *word) {
 }
 
 int has_weird_caps(char *word) {
+
+    int letters_in_word = 0;
+    char *ptr = word;
+    while (*ptr != '\0') {
+        if (isalpha(*ptr)) letters_in_word += 1;
+        ptr += 1;
+    }
+
+    // printf(" -------------> letters in word: %d, word: %s\n", letters_in_word, word);
+
+    int num_capital_letters = 0;
+    char *ptr2 = word;
+    while (*ptr2) {
+        if (isupper(*ptr2)) {
+            num_capital_letters += 1;
+        }
+        ptr2 += 1;
+    }
+
+    // printf(" -------------> num capital letters: %d, word: %s\n", num_capital_letters, word);
+
+    if (num_capital_letters == letters_in_word) {
+        // printf("-------> word is all caps\n");
+        return FALSE;
+    } else {
+        // printf("---> word: %s has weird caps\n", word);
+        return TRUE;
+    }
+
+
     // int letter_count = 0;
     // int num_cap_letters = 0;
     // char *ptr = word;
@@ -242,43 +272,123 @@ int has_weird_caps(char *word) {
     // if (num_cap_letters == letter_count) {
     //     return FALSE;
     // } else {
+    //     printf("----------- this word has weird caps: %s\n", word);
     //     return TRUE;
     // }
 
-    if (word == NULL) {
+    // char *ptr = word;
+
+    // if (ptr == NULL) {
+    //     return FALSE; // Return false if the input string is NULL
+    // }
+
+    // int capitalCount = 0;
+    // int letterCount = 0;
+
+    // while (*ptr) {
+    //     if (isalpha(*ptr)) {
+    //         letterCount++; // Increment letter count if character is a letter
+    //         if (isupper(*ptr)) {
+    //             capitalCount++; // Increment capital letter count if character is uppercase
+    //         }
+    //     }
+    //     ptr += 1;
+    // }
+
+    // int result = (capitalCount == letterCount);
+    // if (result == 0) {
+    //     return FALSE;
+    // } else {
+    //     printf("----------- this word has weird caps: %s\n", word);
+    //     return TRUE;
+    // }
+    // return capitalCount == letterCount; // Return true if capital letter count equals letter count
+}
+
+int isFirstLetterCapitalized(const char *str) {
+    if (str == NULL || *str == '\0') {
+        return FALSE; // Return false if the input string is empty or NULL
+    }
+
+    // Check if the first letter is capitalized
+    if (!isupper(*str)) {
+        return FALSE;
+    }
+
+    str++; // Move to the next character
+
+    // Check if the rest of the characters are lowercase
+    while (*str) {
+        if (!islower(*str)) {
+            return FALSE; // Return false if any character is not lowercase
+        }
+        str++;
+    }
+
+    return TRUE; // Return true if the first letter is capitalized and the rest are lowercase
+}
+
+int isAllLowercase(char *str) {
+    if (str == NULL) {
         return FALSE; // Return false if the input string is NULL
     }
 
-    int capitalCount = 0;
-    int letterCount = 0;
-
-    while (*word) {
-        if (isalpha(*word)) {
-            letterCount++; // Increment letter count if character is a letter
-            if (isupper(*word)) {
-                capitalCount++; // Increment capital letter count if character is uppercase
-            }
+    while (*str) {
+        if (!islower(*str)) {
+            return FALSE; // Return false if any character is not lowercase
         }
-        word++;
+        str++;
     }
 
-    int result = (capitalCount == letterCount);
-    if (result == 0) {
-        return FALSE;
-    } else {
-        return TRUE;
-    }
-    // return capitalCount == letterCount; // Return true if capital letter count equals letter count
+    return TRUE; // Return true if all characters are lowercase
 }
+
+int isAllUppercase(char *str) {
+    if (str == NULL) {
+        return FALSE; // Return false if the input string is NULL
+    }
+
+    while (*str) {
+        if (!isupper(*str)) {
+            return FALSE; // Return false if any character is not uppercase
+        }
+        str++;
+    }
+
+    return TRUE; // Return true if all characters are uppercase
+}
+
+
 
 int validate_component(char *component) {
     if (DEBUG) {
         printf("Validating Word: %s\n", component);
     }
 
-    if (has_weird_caps(component) == TRUE) {            // if given a word like McDonald, check McDonald and MACDONALD 
+    if (isAllUppercase(component)) {
 
-        if (binary_search(wordCount, dict_array, component, 0) != -1) {
+        if (linearSearch(component, dict_array, wordCount) != -1) {
+            return TRUE;
+        }
+
+        // check the first letter capitalized version:
+        char *capFirstLetter = capitalizeFirstLetter(component);
+        // if (binary_search(wordCount, dict_array, capFirstLetter, 0) != -1) {    // if it's found return true
+        //     free(capFirstLetter);
+        //     return TRUE;
+        // }
+        if (linearSearch(capFirstLetter, dict_array, wordCount) != -1) {
+            free(capFirstLetter);
+            return TRUE;
+        }
+        free(capFirstLetter);
+        return FALSE;
+
+    } else if (has_weird_caps(component) == TRUE && !isAllLowercase(component)) {            // if given a word like McDonald, check McDonald and MACDONALD 
+
+        // printf(" --------------> word: %s, has weird caps and is not lowercase\n", component);
+
+        if (binary_search(wordCount, dict_array, component, 0) != -1) { // binary search the word itself
             return TRUE;
         }
         char *uppercase = toUppercase(component);

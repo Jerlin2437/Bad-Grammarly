@@ -10,3 +10,4 @@ extern char **dict_array;
 char **read_dictionary(int, int *);
 int find_dictlength(int);
 int binary_search(int, char **, char *, int);
+int linearSearch(char *, char **, int);

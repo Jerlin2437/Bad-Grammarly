@@ -191,6 +191,15 @@ char* makeLowercase(const char *word) {
     return lowercase;
 }
 
+int linearSearch(char *target,char **arr, int size) {
+    for (int i = 0; i < size; i++) {
+        if (strcmp(target, arr[i]) == 0) {
+            return i; // Return the index if target string is found
+        }
+    }
+    return -1; // Return -1 if target string is not found
+}
+
 int binary_search(int dict_size, char **dict, char *target, int allCapsStatus) {
 	int lo = 0;
 	int hi = dict_size - 1;
