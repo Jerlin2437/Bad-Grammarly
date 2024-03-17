@@ -29,13 +29,15 @@ char* strip(char *word) {
     // Trim leading characters
     while (strchr("'\"([{", *word)) word++;
 
-    // Trim trailing punctuation
+    // Find the end of the string
     end = word + strlen(word) - 1;
-    while (end > word && ispunct((unsigned char)*end)) end--;
+
+    // Trim trailing non-alpha characters
+    while (end > word && !isalpha((unsigned char)*end)) end--;
 
     // Write new null terminator
-    *(end + 1) = 0;
-
+    *(end + 1) = '\0';
+    printf("Trimmed Word: %s\n", word);
     return word;
 }
 
