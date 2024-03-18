@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 #ifndef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 #endif
 
 #ifndef BUFSIZE
@@ -21,7 +21,6 @@
 
 static int row_pos;
 static int col_pos;
-static int word_start_pos;
 
 char* strip(char *word) {
     char *end;
@@ -128,22 +127,36 @@ int validate_component(char *component) {
     return FALSE;
 }
 
+char *strdup(const char *c)
+{
+    char *dup = malloc(strlen(c) + 1);
 
+    if (dup != NULL)
+       strcpy(dup, c);
+
+    return dup;
+}
 // Enhanced validate_word function
 int validate_word(char *word, char *path, int word_start_col) {
     word = strip(word);
-
+ 
+    char* original = strdup(word);
+    if (word == NULL) {
+       
+        return FALSE;
+    }
     // Check for hyphenated words
     char *hyphenated = strtok(word, "-");
     // printf("hyphen: %s\n", hyphenated);
     while (hyphenated) {
         if (validate_component(hyphenated) == FALSE) {
-            printf("%s (%d,%d): %s\n", path, row_pos, word_start_col, word);
+            printf("%s (%d,%d): %s\n", path, row_pos, word_start_col, original);
+            free(original);
             return FALSE;
         }
         hyphenated = strtok(NULL, "-");
     }
-
+    free (original);
     return TRUE;
 }
 
@@ -153,7 +166,6 @@ void parse_line(char *path, char *line, int* status) {
 
     int word_start_pos = 1;
     int count = 1; // counting letters in word
-    int offset = 0;
     char *word;
     char *ptr = line;
     char *prev = ptr;
@@ -198,7 +210,7 @@ void parse_line(char *path, char *line, int* status) {
 
     if (prev == ptr) return;
 
-    // NOTE: will need to check this after reworking above
+ 
     if (*ptr == '\0') {
 
 

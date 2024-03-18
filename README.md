@@ -20,6 +20,7 @@ Bad-Grammarly is a spell checking tool designed for systems programming. The pro
 ## Specific Design Notes
 #### dictionary.c 
 - The dictionary is read from a file specified at runtime from `spchk.c`, allowing for different dictionaries throughout separate runs.
+- We QSORT the dictionary beforehand, ensuring that it is sorted properly. 
 - `dict_array` and each string within `dict_array` is allocated with `malloc`, meaning we had to consider memory management to avoid leaks. 
 - Error handling is implemented to address potential issues like file read errors or memory allocation failures.
 - The highly modular design, and splitting up the dictionary into three parts, `read_dictionary`, `find_dictlength`, and `binary_search` allow for easy updates such as supporting different dictionary formats or introducing more efficient search algorithms.
@@ -44,7 +45,9 @@ Please use the dictionary, `./fullDict`, to test.
 
 To ensure the reliability of Bad-Grammarly, consider the following test scenarios and cases:
 
-1. **Single File Test**: `test1.txt`, is a single file containing a few spelling errors
-2. **Directory Test**: `subDir` is a directory consisting of another directory called `subsubDir` and files inside both directories. The program should execute all `.txt` files inside all subdirectories while ignoring other files or .txt files starting with a `.`
-3. **Hyphenation and Capitalization**: `test2.txt` Test words with hyphens and different capitalizations to ensure they are validated correctly.
-4. **Punctuation Handling**: `test3.txt` Tests if leading and trailing punctuation is correctly ignored during spell checking.
+1. **Single File Test**: `text1.txt`, is a single file containing a few spelling errors
+2. **Directory Test**: `subDir` is a directory. The program should execute all `.txt` files inside all subdirectories while ignoring other files or .txt files starting with a `.
+3. **Hyphenation and Capitalization**: `text2.txt` Test words with hyphens and different capitalizations to ensure they are validated correctly. There should be some errors.
+4. **Punctuation Handling**: `text3.txt` Tests if leading and trailing punctuation is correctly ignored during spell checking, there should once again, be some errors.
+5. **Directory in Directory Test**: `errortesting` is a directory and contains `subDirinError` which then contains `subSubDirinError`. This should recursively check both `errortesting`, `subDirinError`, and `subSubDirinError` directories
+6. **Weird Words**: `weirdwords.txt` tests unconventional words and returns errors. 

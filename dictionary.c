@@ -20,6 +20,12 @@ int wordCount;
 #define BUFLENGTH 16
 #endif
 
+int compare_strings(const void *a, const void *b) {
+    const char *str1 = *(const char **)a;
+    const char *str2 = *(const char **)b;
+    return strcmp(str1, str2);
+}
+
 int find_dictlength(int fd) {
     int result = 0;
     int buflength = BUFLENGTH;
@@ -174,7 +180,7 @@ char **read_dictionary(int fd, int *word_count) {
 	// close(fd);
     *word_count = count;
 	wordCount = count;
-
+	qsort(dict_array, count, sizeof(char *), compare_strings);
     return dict_array;
 }
 char* makeLowercase(const char *word) {
