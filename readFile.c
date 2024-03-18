@@ -125,7 +125,7 @@ int validate_component(char *component) {
         return TRUE;
        }
     }
-
+    return FALSE;
 }
 
 
@@ -147,7 +147,7 @@ int validate_word(char *word, char *path, int word_start_col) {
     return TRUE;
 }
 
-void parse_line(char *path, char *line) {
+void parse_line(char *path, char *line, int* status) {
     
   
 
@@ -189,6 +189,9 @@ void parse_line(char *path, char *line) {
         word[count-1] = '\0';
         int result = validate_word(word, path, word_start_pos);
         free(word);
+        if (result == FALSE){
+            *status = 0;
+        }
         
 
     }
@@ -204,11 +207,16 @@ void parse_line(char *path, char *line) {
         word[count-1] = '\0';
         int result = validate_word(word, path, word_start_pos);
         free(word);
+        
+        if (result == FALSE){
+            *status = 0;
+        }
     }
+    
     // col_pos = 1;
 }
 
-void parse_file(char *path) {
+void parse_file(char *path, int* status) {
 
     // // printf("from parse file: %s\n", path);
 
@@ -239,7 +247,7 @@ void parse_file(char *path) {
             if (buf[pos] == '\n') {
                 // we found a line
                 buf[pos] = '\0';
-                parse_line(path, buf + line_start);
+                parse_line(path, buf + line_start, status);
                 col_pos = 1;
                 // printf("from inside while: %s\n", buf + line_start);
                 row_pos += 1;
@@ -272,7 +280,7 @@ void parse_file(char *path) {
             buf = realloc(buf, buflength + 1);
         }
         buf[pos] = '\0';
-        parse_line(path, buf);
+        parse_line(path, buf, status);
         // printf("%s\n", buf);
         row_pos += 1;
     }

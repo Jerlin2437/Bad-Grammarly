@@ -45,7 +45,7 @@ void readFile(const char *filePath);
 
 
 //works - j 3.13
-void findTxtFiles(const char *dirPath) {
+void findTxtFiles(const char *dirPath, int* status) {
     DIR *dir = opendir(dirPath);
     if (dir == NULL) {
         fprintf(stderr, "Cannot open directory '%s'\n", dirPath);
@@ -63,14 +63,14 @@ void findTxtFiles(const char *dirPath) {
                 continue;
             }
             // Calls subdir if a subdir exists
-            findTxtFiles(fullPath);
+            findTxtFiles(fullPath,  status);
         } else if (entry->d_type == DT_REG) {
             // Check if the file name ends with ".txt" and does not start with '.'
             char *ext = strrchr(entry->d_name, '.');
             if (ext && strcmp(ext, ".txt") == 0 && entry->d_name[0] != '.') {
                 printf("Found text file: %s, now parsing...\n", fullPath);
                 // save_path(fullPath);
-                parse_file(fullPath);
+                parse_file(fullPath, status);
             }
         }
     }
@@ -79,11 +79,11 @@ void findTxtFiles(const char *dirPath) {
 }
 
 int main(int argc, char *argv[]) {
-
+    int status = 1;
     // check if dictionary was provided
     if (argc < 2) {
         fprintf(stderr, "Error: Missing a Dictionary\n");
-        return 1;
+        exit(EXIT_FAILURE);
     }
 
     // check if at least one text file to test was provided
@@ -122,12 +122,11 @@ int main(int argc, char *argv[]) {
             
             // It's a regular file
             printf("We've found a regular file: %s\n", argv[i]);
-            parse_file(argv[i]);
-           // readFile(argv[i]);
+            parse_file(argv[i], &status);
         } else if (S_ISDIR(path_stat.st_mode)) {
             // It's a directory
             printf("We've found a directory: %s\n", argv[i]);
-            findTxtFiles(argv[i]);
+            findTxtFiles(argv[i], &status);
         } else {
             fprintf(stderr, "%s is not a regular file or directory\n", argv[i]);
         }
@@ -162,5 +161,13 @@ int main(int argc, char *argv[]) {
     free(file_paths);
     free(dictionary);
     close(fdDict);
-    return 0;
+    
+    if(status == 0){
+        exit(EXIT_FAILURE);
+        
+    }
+    else {
+        exit(EXIT_SUCCESS);
+    }
+    
 }
