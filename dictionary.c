@@ -81,17 +81,9 @@ int find_dictlength(int fd) {
 //currently there is an infinite loop from the lseek at the end of the read
 char **read_dictionary(int fd, int *word_count) {
 	
-    // int fd = open(path, O_RDONLY);
-    // if (fd < 0) {
-    //     perror(path);
-    //     exit(EXIT_FAILURE);
-    // }
-
-    // char **words = (char **)malloc(INITIAL_ARRAY_SIZE * sizeof(char *));
+    
 	numlines = find_dictlength(fd);
-	// printf("numlines (line 90): %d\n", numlines);
 	
-	// printf("Numlines: %d\n", numlines);
 
 	dict_array = (char **) malloc(numlines * sizeof(char *));
     if (dict_array == NULL) {

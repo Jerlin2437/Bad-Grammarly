@@ -15,36 +15,11 @@
 #endif
 
 static char **file_paths;
-static int num_files = 0;
-
-void save_path(char *path) {
-    // printf("path passed to save_path: %s\n", path);
-    file_paths = realloc(file_paths, sizeof(char *) * (num_files + 1));
-    file_paths[num_files] = path;
-    // printf("after reallocation: %s\n", file_paths[num_files]);
-    // if (file_paths == NULL) {
-    //     file_paths = (char **) malloc(sizeof(char *));
-    //     if (file_paths == NULL) {
-    //         fprintf(stderr, "Error: memory allocation error.\n");
-    //         exit(EXIT_FAILURE);
-    //     }
-    //     file_paths[num_files++] = path;
-    // } else {
-    //     file_paths = realloc(file_paths, sizeof(char *) * (num_files + 1));
-    //     if (file_paths == NULL) {
-    //         fprintf(stderr, "Error: Memory reallocation/allocation error.\n");
-    //         exit(EXIT_FAILURE);
-    //     }
-    //     file_paths[num_files++] = path;
-    // }
-    num_files += 1;
-}
 
 //Only a function declaration so far of readFile, which readsTxt file and executes it
 void readFile(const char *filePath);
 
 
-//works - j 3.13
 void findTxtFiles(const char *dirPath, int* status) {
     DIR *dir = opendir(dirPath);
     if (dir == NULL) {
@@ -69,7 +44,6 @@ void findTxtFiles(const char *dirPath, int* status) {
             char *ext = strrchr(entry->d_name, '.');
             if (ext && strcmp(ext, ".txt") == 0 && entry->d_name[0] != '.') {
                 printf("Found text file: %s, now parsing...\n", fullPath);
-                // save_path(fullPath);
                 parse_file(fullPath, status);
             }
         }
@@ -132,27 +106,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    //prints out txt files in given direrctory (argv2)
-    
-    //works -j 3/13
-    // int result = binary_search(word_counts, dictionary, "ABSTRACT");
-    // if (result >= 0) {
-    //     printf("FOUND\n");
-    // } else {
-    //     printf("FALSE\n");
-    // }
-
-    //////// prints to see if saved_files works
-    // char **ptr = file_paths;
-    // int count = 0;
-    // while (count < num_files) {
-    //     printf("%s\n", *ptr);
-    //     ptr += 1;
-    //     count+= 1;
-    // }
-    // printf("num_files: %d\n", num_files);
-
-    ////////
+   
 
     for (int i = 0; i < word_counts; i++) {
         free(dictionary[i]);
